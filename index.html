@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>BlipChat widget</title>
+</head>
+
+<body class="login-block">
+  <script src="https://takenetomni.blob.core.windows.net/media-db/blip-chat-widget-hmg.js" type="text/javascript"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.11/jquery.mask.min.js"></script>
+  <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <!------ Include the above in your HEAD tag ---------->
+
+  <section id="principal" class="col-md-12">
+    <div class="container col-md-4">
+      <div class="row justify-content-center">
+        <div class="col-md-8 login-sec">
+          <img src="src/images/logo.png" class="img-fluid rounded" alt="Brasilprev">
+          <h2 class="text-center"></h2>
+          <form class="login-form" onsubmit="login();return false">
+            <div class="form-group">
+              <label for="cpf" class="text-uppercase">CPF</label>
+              <input type="text" class="form-control" id="cpf" placeholder="" value="" required>
+            </div>
+            <div class="form-group">
+              <label for="password" class="text-uppercase">Senha</label>
+              <input type="password" class="form-control" id="password" placeholder="" value="" required>
+            </div>
+            <div class="form-check">
+              <button id="btn" type="submit" class="btn btn-login float-right">Entrar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+  </section>  
+
+  <div id="sdk-target" style="height:100%; width: 100%; display: none"></div>
+
+  <form class="col-md-12 mb-3 d-none">
+    <div class="form-row">
+      <div class="col-md-12 mb-3">
+        <h3>Configurações</h3>
+      </div>
+    </div>
+    <div class="form-row bg-light rounded mb-3">
+      <div class="col-md-6 mb-3">
+        <strong><label for="app-key">App Key</label></strong>
+        <input type="text" class="form-control" id="app-key" placeholder="App Key" value="Y29uc3VsdG9ydmlydHVhbHY1MTo1MmE0NmU1Ny0zNjNkLTRhZjktYWFiZC1kYjU2ODU3ZjZjMzU="
+          required>
+      </div>
+      <div class="col-md-6 mb-3">
+        <strong><label for="environment">Environment</label></strong>
+        <input type="text" class="form-control" id="environment" placeholder="Environment" value="production" required>
+      </div>
+    </div>
+    <div class="col-md-12 mb-3">
+      <label for="email">E-mail</label>
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="inputGroupPrepend">@</span>
+        </div>
+        <input type="text" class="form-control" id="email" placeholder="E-mail" aria-describedby="inputGroupPrepend"
+          required>
+      </div>
+    </div>
+    <div class="col-md-12 mb-3">
+      <label for="fullName">Nome Completo</label>
+      <input type="text" class="form-control" id="fullName" placeholder="Nome Completo" value="" required>
+    </div>
+  </form>
+
+  <!--<div id="sdk-target" style="height:550px; width: 50%"> </div>-->
+
+  <script>
+    function login() {
+      var objPrincipal = document.getElementById('principal');
+      var objTarget = document.getElementById('sdk-target');
+
+      if (objPrincipal.style.display = "block") {
+        objPrincipal.style.display = "none";
+        objTarget.style.display = "block";
+      }
+      else {
+        objPrincipal.style.display = "block";
+        objTarget.style.display = "none";
+      }
+
+      buildChat({ authType: BlipChat.DEV_AUTH });
+      toogleChat();
+    }
+  </script>
+
+  <script>
+
+    var sendMessage;
+    var destroyChat;
+    var buildChat;
+
+    var target;
+    var builder;
+    (function () {
+      window.onload = function () {
+        toogleChat = function () {
+          builder.toogleChat();
+
+        }
+
+        sendMessage = function () {
+          let msgFieldValue
+          try {
+            msgFieldValue = JSON.parse(document.getElementById('test-message').value);
+          } catch (error) {
+            msgFieldValue = document.getElementById('test-message').value;
+          }
+          builder.sendMessage(msgFieldValue);
+        }
+
+        sendCommand = function () {
+          try {
+            const command = JSON.parse(document.getElementById('test-command').value);
+            builder.sendCommand(command);
+          } catch (error) {
+            alert('Comando invalido')
+          }
+        }
+
+        destroyChat = function () {
+          builder.destroy();
+          builder = null;
+        }
+
+        buildChat = function (authConfig) {
+          if (builder) {
+            destroyChat();
+          }
+
+          if (authConfig && authConfig.authType == BlipChat.DEV_AUTH) {
+            authConfig.userIdentity = document.getElementById('cpf').value ? document.getElementById('cpf').value : '01684334-71c7-40e0-ad1a-5ce372de1a08', // Required
+              authConfig.userPassword = document.getElementById('password').value ? document.getElementById('password').value : 'MjU2OWNmOTItYmRjZi00Njg0LTljZDktMWQxNjQxYmYxMGU1', // Required
+              authConfig.userName = document.getElementById('fullName').value ? document.getElementById('fullName').value : '', // Optional
+              authConfig.userEmail = document.getElementById('email').value ? document.getElementById('email').value : ''// Optional
+          }
+
+          const environment = document.getElementById('environment').value ? document.getElementById('environment').value : 'production'
+          const appKey = document.getElementById('app-key').value || 'Y29uc3VsdG9ydmlydHVhbHY1MTo1MmE0NmU1Ny0zNjNkLTRhZjktYWFiZC1kYjU2ODU3ZjZjMzU='
+
+          builder = new BlipChat()
+            .withAppKey(appKey)
+            .withButton({ "color": "#2f469d" })
+            .withTarget('sdk-target')
+            .withEnvironment(environment)
+            .withAuth(authConfig)
+            .withAccount({
+              "fullName": "",
+              "phoneNumber": "",
+              "email": "",
+              "encryptMessageContent": true
+            })
+            //.withCustomStyle(customStyle)
+            .withEventHandler(BlipChat.ENTER_EVENT, function () {
+              console.log('enter')
+            })
+            .withEventHandler(BlipChat.LEAVE_EVENT, function () {
+              console.log('leave')
+            })
+            .withEventHandler(BlipChat.LOAD_EVENT, function () {
+              console.log('chat loaded')
+            })
+            .withEventHandler(BlipChat.CREATE_ACCOUNT_EVENT, function () {
+              console.log('account created')
+            })
+          builder.build()
+        }
+
+        changeSDK = function () {
+          if (target) {
+            target = null;
+          } else {
+            target = 'sdk-target';
+          }
+
+          buildChat();
+        }
+
+        applyValues = function () {
+          options.window.title = document.getElementById('title').value;
+          options.window.iconPath = document.getElementById('iconPath').value;
+          options.window.widgetColor = document.getElementById('widgetColor').value;
+          options.window.hideMenu = !document.getElementsByName('hideMenu')[1].checked;
+
+          buildChat(options.config.authType);
+        }
+
+        buildChat();
+      }
+    })();
+
+  </script>
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>
+</body>
+
+</html>
